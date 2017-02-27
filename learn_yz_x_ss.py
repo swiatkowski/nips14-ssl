@@ -6,7 +6,7 @@ import scipy.stats
 import anglepy.paramgraphics as paramgraphics
 import anglepy.ndict as ndict
 
-from anglepy.sfo import SFO
+#from anglepy.sfo import SFO
 from adam import AdaM
 
 import theano
@@ -59,13 +59,13 @@ def main(n_passes, n_labeled, n_z, n_hidden, dataset, seed, alpha, n_minibatches
         def transform(v, _x):
             return l1_model.dist_qz['z'](*([_x] + v.values() + [np.ones((1, _x.shape[1]))]))
         q_mean, _ = transform(l1_v, x_u[0:1000])
-        idx_keep = np.std(q_mean, axis=1) > 0.1
+        idx_keep = [True] * 50  # p.std(q_mean, axis=1) > 0.1
         
         # 2. Select dimensions
         for key in ['mean_b','mean_w','logvar_b','logvar_w']:
             l1_v[key] = l1_v[key][idx_keep,:]
         l1_w['w0'] = l1_w['w0'][:,idx_keep]
-        
+
         # 3. Extract features
         x_mean_u, x_logvar_u = transform(l1_v, x_u)
         x_mean_l, x_logvar_l = transform(l1_v, x_l)
@@ -75,7 +75,7 @@ def main(n_passes, n_labeled, n_z, n_hidden, dataset, seed, alpha, n_minibatches
         valid_x, _ = transform(l1_v, valid_x)
         test_x, _ = transform(l1_v, test_x)
         
-        n_x = np.sum(idx_keep)
+        n_x = 50 #np.sum(idx_keep)
         n_y = 10
         
         type_pz = 'gaussianmarg'
