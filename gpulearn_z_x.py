@@ -16,7 +16,7 @@ from collections import OrderedDict
 import preprocessing as pp
 
 def main(n_z, n_hidden, dataset, seed, comment, gfx=True):
-    
+
     # Initialize logdir
     import time
     logdir = 'results/gpulearn_z_x_'+dataset+'_'+str(n_z)+'-'+str(n_hidden)+'_'+comment+'_'+str(int(time.time()))+'/'
@@ -371,7 +371,7 @@ def main(n_z, n_hidden, dataset, seed, comment, gfx=True):
     pass
 
 # Training loop for variational autoencoder
-def loop_va(doEpoch, hook, n_epochs=9999999):
+def loop_va(doEpoch, hook, n_epochs=2):
     
     t0 = time.time()
     for t in xrange(1, n_epochs):
