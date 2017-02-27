@@ -87,7 +87,7 @@ class GPUVAE_YZ_X(ap.GPUVAEModel):
             q_logvar = T.dot(v['logvar_w'], hidden_q[-1]) + T.dot(v['logvar_b'], A)
         else: raise Exception()
         
-        # function for distribution q(z|x)
+        # function for distribution q(z|x,y)
         theanofunc = lazytheanofunc('warn', mode='FAST_RUN')
         self.dist_qz['z'] = theanofunc([x['x'], x['y']] + [A], [q_mean, q_logvar])
         
@@ -95,7 +95,7 @@ class GPUVAE_YZ_X(ap.GPUVAEModel):
         eps = rng.normal(size=q_mean.shape, dtype='float32')
         _z = q_mean + T.exp(0.5 * q_logvar) * eps
         
-        # Compute log p(x|z)
+        # Compute log p(x|z,y)
         hidden_p = [nonlinear_p(T.dot(w['w0y'], x['y']) + T.dot(w['w0z'], _z) + T.dot(w['b0'], A))]
         for i in range(1, len(self.n_hidden_p)):
             hidden_p.append(nonlinear_p(T.dot(w['w'+str(i)], hidden_p[-1]) + T.dot(w['b'+str(i)], A)))
