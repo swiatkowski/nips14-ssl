@@ -10,6 +10,6 @@ print 'seed:', seed
 if n_labels not in (100,600,1000,3000):
     print 'WARNING: for MNIST, n_labels should be in (100,600,1000,3000), otherwise the number of datapoints might not be a multiple of the number of minibatches.'
 if n_labels == 100:
-    learn_yz_x_ss.main(2, n_labels, dataset='mnist_2layer', n_z=50, n_hidden=(300,), seed=seed, alpha=0.1, n_minibatches=100, comment='')
+    learn_yz_x_ss.main(2, n_labels, dataset='mnist_2layer', n_z=50, n_hidden=(300,300), seed=seed, alpha=0.1, n_minibatches=100, comment='')
 else: # prev not 2 but 3000
     learn_yz_x_ss.main(2, n_labels, dataset='mnist_2layer', n_z=50, n_hidden=(500,500), seed=seed, alpha=0.1, n_minibatches=200, comment='')
