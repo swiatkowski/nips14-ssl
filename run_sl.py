@@ -14,8 +14,28 @@ if dataset == 'mnist':
     train_y = mnist.binarize_labels(train_y)
     prior_y = train_y.mean(axis=1).reshape((10,1))
 
+    def dim_reduction_with_m1(test_x):
+        # Define model
+        n_h = (500,500)
+        from anglepy.models.VAE_Z_X import VAE_Z_X
+        l1_model = VAE_Z_X(n_x=28*28, n_hidden_q=n_h, n_z=50, n_hidden_p=n_h, nonlinear_q='softplus', nonlinear_p='softplus', type_px='bernoulli', type_qz='gaussianmarg', type_pz='gaussianmarg', prior_sd=1)
+
+        # Load model for feature extraction
+        path = 'models/mnist_z_x_50-500-500_longrun/' #'models/mnist_z_x_50-600-600/'
+        l1_v_m1 = ndict.loadz(path+'v.ndict.tar.gz')
+
+        def transform(v, _x):
+            return l1_model.dist_qz['z'](*([_x] + v.values() + [np.ones((1, _x.shape[1]))]))
+
+        # Extract features
+        test_x, _ = transform(l1_v_m1, test_x)
+        return test_x
+
+    # Perform dim reduction with M1 
+    test_x = dim_reduction_with_m1(test_x)
+    print test_x.shape	
     # Create model
-    n_x = 28*28
+    n_x = 50 
     n_y = 10
     n_z = 50
     n_hidden = 500,500
@@ -23,9 +43,11 @@ if dataset == 'mnist':
     model = GPUVAE_YZ_X(updates, n_x, n_y, n_hidden, n_z, n_hidden, 'softplus', 'softplus', type_px='bernoulli', type_qz='gaussianmarg', type_pz='gaussianmarg', prior_sd=1, uniform_y=True)
 
     # Load parameters
-    dir = 'models/mnist_yz_x_50-500-500/'
-    ndict.set_value(model.v, ndict.loadz(dir+'v_best.ndict.tar.gz'))
-    ndict.set_value(model.w, ndict.loadz(dir+'w_best.ndict.tar.gz'))
+    dir = 'results/learn_yz_x_ss_mnist_2layer_50-(500, 500)_nlabeled600_alpha0.1_seed1_-1488227057/'
+    #dir = 'models/mnist_yz_x_50-500-500/'
+
+    ndict.set_value(model.v, ndict.loadz(dir+'v.ndict.tar.gz'))
+    ndict.set_value(model.w, ndict.loadz(dir+'w.ndict.tar.gz'))
 
 else:
     raise Exception("Unknown dataset")
@@ -56,7 +78,7 @@ def get_predictions(n_samples=1000, show_convergence=True):
     posterior = get_posterior(px / n_samples, prior_y)
     return np.argmax(posterior, axis=0)
 
-n_samples = 1000
+n_samples = 3
 print 'Computing class posteriors using a marginal likelihood estimate with importance sampling using ', n_samples, ' samples.'
 print 'This is slow, but could be sped up significantly by fitting a classifier to match the posteriors (of the generative model) in the training set.'
 print 'For MNIST, this should converge to ~ 0.96 % error.'
