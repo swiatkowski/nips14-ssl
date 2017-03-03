@@ -5,7 +5,7 @@ import scipy.stats
 import anglepy.paramgraphics as paramgraphics
 import anglepy.ndict as ndict
 import matplotlib.pyplot as plt
-import Image
+#import Image
 import math
 
 import theano
@@ -176,8 +176,8 @@ def main(n_z, n_hidden, dataset, seed, gfx=True, _size=None):
     
     # Progress hook
     def hook(epoch, t, ll):
-        
-        if epoch%10 != 0:
+
+        if epoch%10 != 0 and epoch != 1: 
             return
         
         ll_valid, _ = model.est_loglik(x_valid, n_samples=L_valid, n_batch=n_batch, byteToFloat=byteToFloat)
@@ -282,7 +282,7 @@ def main(n_z, n_hidden, dataset, seed, gfx=True, _size=None):
     pass
 
 # Training loop for variational autoencoder
-def loop_va(doEpoch, hook, n_epochs=2):
+def loop_va(doEpoch, hook, n_epochs=9999999):
     import time
     t0 = time.time()
     for t in xrange(1, n_epochs):

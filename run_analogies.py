@@ -2,7 +2,7 @@ import sys
 sys.path.append('..')
 sys.path.append('../../data/')
 
-import math, os, time, scipy.stats, numpy as np, pylab, Image, PIL.Image
+import math, os, time, scipy.stats, numpy as np, pylab #, Image, PIL.Image
 import matplotlib.pyplot as plt, matplotlib.cm as cm
 import numpy.random
 import theano, theano.tensor as T
@@ -39,7 +39,8 @@ if dataset == 'svhn':
     if True:
         n_hidden = (500,500)
         n_z = 300
-        dir = 'models/svhn_yz_x_300-500-500/'
+        #dir = 'models/svhn_yz_x_300-500-500/'
+        dir = 'results/gpulearn_yz_x_svhn_300-[500, 500]-1488575207/'
         from anglepy.models import GPUVAE_YZ_X
         model = GPUVAE_YZ_X(None, n_x, n_y, n_hidden, n_z, n_hidden[::-1], nonlinear, nonlinear, type_px, type_qz=type_qz, type_pz=type_pz, prior_sd=100, init_sd=1e-2)
         w = ndict.loadz(dir+'w_best.ndict.tar.gz')
