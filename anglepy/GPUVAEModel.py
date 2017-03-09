@@ -44,8 +44,9 @@ class GPUVAEModel(object):
         self.dist_pz = {}
         
         logpx, logpz, logqz = self.factors(x, z, A)
-        
+         
         if get_optimizer == None:
+            print 'Didnt get your optimizer'
             def get_optimizer(w, g):
                 from collections import OrderedDict
                 updates = OrderedDict()

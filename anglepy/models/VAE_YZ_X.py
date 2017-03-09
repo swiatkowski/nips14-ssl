@@ -11,10 +11,12 @@ import math, inspect
 '''
 Variational AE (VAE) with P(Z)P(Y)P(X|Y,Z)
 '''
+def shared32(x, name=None, borrow=False):
+    return theano.shared(np.asarray(x, dtype='float32'), name=name, borrow=borrow)
 
 class VAE_YZ_X(ap.VAEModel):
     
-    def __init__(self, n_x, n_y, n_hidden_q, n_z, n_hidden_p, nonlinear_q='tanh', nonlinear_p='tanh', type_px='bernoulli', type_qz='gaussianmarg', type_pz='gaussianmarg', prior_sd=1, uniform_y=False):
+    def __init__(self, get_optimizer, n_x, n_y, n_hidden_q, n_z, n_hidden_p, nonlinear_q='tanh', nonlinear_p='tanh', type_px='bernoulli', type_qz='gaussianmarg', type_pz='gaussianmarg', prior_sd=1, uniform_y=False):
         self.constr = (__name__, inspect.stack()[0][3], locals())
         self.n_x = n_x
         self.n_y = n_y
@@ -28,7 +30,14 @@ class VAE_YZ_X(ap.VAEModel):
         self.type_pz = type_pz
         self.prior_sd = prior_sd
         self.uniform_y = uniform_y
-        super(VAE_YZ_X, self).__init__()
+
+        # Init weights
+        v, w = self.init_w(1e-2)
+        for i in v: v[i] = shared32(v[i])
+        for i in w: w[i] = shared32(w[i])
+        self.v = v
+        self.w = w
+        super(VAE_YZ_X, self).__init__(get_optimizer)
     
     def factors(self, v, w, x, z, A):
             

@@ -14,7 +14,7 @@ Fully connected deep variational auto-encoder (VAE_Z_X)
 
 class VAE_Z_X(ap.VAEModel):
     
-    def __init__(self, n_x, n_hidden_q, n_z, n_hidden_p, nonlinear_q='tanh', nonlinear_p='tanh', type_px='bernoulli', type_qz='gaussianmarg', type_pz='gaussianmarg', prior_sd=1, var_smoothing=0):
+    def __init__(self, get_optimizer, n_x, n_hidden_q, n_z, n_hidden_p, nonlinear_q='tanh', nonlinear_p='tanh', type_px='bernoulli', type_qz='gaussianmarg', type_pz='gaussianmarg', prior_sd=1, var_smoothing=0):
         self.constr = (__name__, inspect.stack()[0][3], locals())
         self.n_x = n_x
         self.n_hidden_q = n_hidden_q
@@ -27,7 +27,7 @@ class VAE_Z_X(ap.VAEModel):
         self.type_pz = type_pz
         self.prior_sd = prior_sd
         self.var_smoothing = var_smoothing
-        super(VAE_Z_X, self).__init__()
+        super(VAE_Z_X, self).__init__(get_optimizer)
     
     def factors(self, v, w, x, z, A):
             

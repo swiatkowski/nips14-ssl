@@ -15,7 +15,7 @@ import inspect
 # Model
 class VAEModel(object):
     
-    def __init__(self, theano_warning='raise'):
+    def __init__(self, get_optimizer, theano_warning='raise'):
         
         theanofunction = lazytheanofunc('warn', mode='FAST_RUN')
         theanofunction_silent = lazytheanofunc('ignore', mode='FAST_RUN')
@@ -37,13 +37,25 @@ class VAEModel(object):
         self.dist_px = {}
         self.dist_pz = {}
         
+        if get_optimizer == None:
+            print 'Didnt get your optimizer'
+            def get_optimizer(w, g):
+                from collections import OrderedDict
+                updates = OrderedDict()
+                for i in w: updates[w[i]] = w[i]
+                return updates
+
         logpv, logpw, logpx, logpz, logqz = self.factors(v, w, x, z, A)
         
         # Log-likelihood lower bound
         self.f_L = theanofunction(allvars, [logpx, logpz, logqz])
         L = (logpx + logpz - logqz).sum()
         dL_dw = T.grad(L, v.values() + w.values())
-        self.f_dL_dw = theanofunction(allvars, [logpx, logpz, logqz] + dL_dw)
+    
+        gv, gw = dict(zip(v.keys(), dL_dw[0:len(v)])), dict(zip(w.keys(), dL_dw[len(v):len(v)+len(w)]))
+        updates = get_optimizer(v, gv)
+        updates.update(get_optimizer(w, gw))
+        self.f_dL_dw = theanofunction(allvars, [logpx, logpz, logqz] + dL_dw, updates=updates)
         
         weights = T.dmatrix()
         dL_weighted_dw = T.grad((weights * (logpx + logpz - logqz)).sum(), v.values() + w.values())
@@ -124,7 +136,7 @@ class VAEModel(object):
     # Gradient of logp(x,z|w) and logq(z) w.r.t. parameters
     def dL_dw(self, v, w, x, z):
         x, z = self.xz_to_theano(x, z)
-        v, w, z, x = ndict.ordereddicts((v, w, z, x))
+        v, w, z, x = ndict.ordereddicts((v, w.eval(), z.eval(), x))
         A = self.get_A(x)
         allvars = v.values() + w.values() + x.values() + z.values() + [A]
         r = self.f_dL_dw(*allvars)

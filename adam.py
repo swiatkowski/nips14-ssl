@@ -23,8 +23,9 @@ class AdaM(object):
             self.m1[i] = {}
             self.m2[i] = {}
             for j in w[i]:
-                self.m1[i][j] = np.zeros(w[i][j].shape)
-                self.m2[i][j] = np.zeros(w[i][j].shape)
+		print w[i][j].shape.eval()
+                self.m1[i][j] = np.zeros(w[i][j].shape.eval())
+                self.m2[i][j] = np.zeros(w[i][j].shape.eval())
     
     '''
     Do num_passes epochs
