@@ -272,8 +272,7 @@ def main(n_z, n_hidden, dataset, seed, comment, gfx=True):
     
     # Progress hook
     def hook(epoch, t, ll):
-        
-        if epoch%10 != 0: return
+        if epoch%10 != 0 and epoch != 1: return
         
         ll_valid, _ = model.est_loglik(x_valid, n_samples=L_valid, n_batch=n_batch, byteToFloat=byteToFloat)
         
@@ -289,7 +288,7 @@ def main(n_z, n_hidden, dataset, seed, comment, gfx=True):
         else:
             ll_valid_stats[1] += 1
             # Stop when not improving validation set performance in 100 iterations
-            if ll_valid_stats[1] > 1000:
+            if ll_valid_stats[1] > 200:
                 print "Finished"
                 with open(logdir+'hook.txt', 'a') as f:
                     print >>f, "Finished"
@@ -371,7 +370,7 @@ def main(n_z, n_hidden, dataset, seed, comment, gfx=True):
     pass
 
 # Training loop for variational autoencoder
-def loop_va(doEpoch, hook, n_epochs=2):
+def loop_va(doEpoch, hook, n_epochs=9999999):
     
     t0 = time.time()
     for t in xrange(1, n_epochs):

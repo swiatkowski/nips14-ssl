@@ -234,8 +234,7 @@ def main(n_z, n_hidden, dataset, seed, gfx=True, _size=None):
             
             if n_z == 2:
                 
-                import ImageFont
-                import ImageDraw
+                from PIL import Image, ImageFont, ImageDraw
                 
                 n_width = 10
                 submosaic_offset = 15
